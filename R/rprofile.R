@@ -9,7 +9,7 @@ projr_rprofile_hpc_renv_setup <- function() {
   txt_rprofile <- c(
     txt_rprofile,
     "\n# make renv use scratch directory",
-    "slurm_ind <- any(grepl("^SLURM_", names(Sys.getenv())))",
+    'slurm_ind <- any(grepl("^SLURM_", names(Sys.getenv())))',
     'dir_exists_ind <- dir.exists(file.path("/scratch/", Sys.getenv("USER")))',
     'if (slurm_ind && dir_exists_ind) {',
     '  source("./scripts/hpc_renv_setup.R")',
