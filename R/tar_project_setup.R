@@ -9,6 +9,9 @@
 #'
 #' @export
 projr_tar_project_set_up <- function(proj_nm) {
+  if (!requireNamespace("targets", quietly = TRUE)) {
+    renv::install("targets")
+  }
   library(targets)
   # set project store and script
   dir_proj <- projr_dir_get("cache", "targets", proj_nm)
