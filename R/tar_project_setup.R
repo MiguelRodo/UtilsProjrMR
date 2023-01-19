@@ -1,3 +1,13 @@
+#' @title Set up a `targets` pipeline
+#'
+#' @description Attaches the \code{targets} package,
+#' configures the pipeline to exist in
+#' \code{projr_dir_get("cache", "targets", projr_nm)}
+#' and sets the system environment variable
+#' \code{TAR_PROJECT} to \code{proj_nm}.
+#' @param proj_nm character
+#'
+#' @export
 projr_tar_project_set_up <- function(proj_nm) {
   library(targets)
   # set project store and script
