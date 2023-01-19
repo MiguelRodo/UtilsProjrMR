@@ -20,4 +20,5 @@ projr_tar_project_set_up <- function(proj_nm) {
   Sys.setenv("TAR_PROJECT" = proj_nm)
   invisible(TRUE)
 }
+#' @export
 projr_tar_project_setup <- projr_tar_project_set_up
