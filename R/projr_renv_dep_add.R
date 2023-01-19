@@ -10,7 +10,7 @@ projr_renv_dep_add <- function(pkg) {
   pkg_inst <- pkg[
     sapply(pkg, function(x) !requireNamespace(x, quietly = TRUE))
   ]
-  if (nzchar(pkg_inst)) {
+  if (length(pkg_inst) > 0) {
     renv::install(pkg_inst)
   }
   if (!file.exists("_dependencies.R")) {
