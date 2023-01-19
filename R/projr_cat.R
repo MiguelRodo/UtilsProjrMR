@@ -43,6 +43,9 @@ projr_cat_slurm_rmd <- function() {
 #' @title Print out code to source scripts
 #' @export
 projr_cat_source_script_r <- function() {
+  if (!requireNamespace("here", quietly = TRUE)) {
+    renv::install("here")
+  }
   cat(
     'for (x in list.files(here::here("R"), pattern = "R$|r$", full.names = TRUE)) {',
     "  source(x)",

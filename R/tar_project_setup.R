@@ -21,6 +21,9 @@ projr_tar_project_set_up <- function(proj_nm) {
   if (!requireNamespace("tibble", quietly = TRUE)) {
     renv::install("tibble")
   }
+  if (!requireNamespace("here", quietly = TRUE)) {
+    renv::install("here")
+  }
   library(targets)
   # set project store and script
   dir_proj <- projr::projr_dir_get("cache", "targets", proj_nm)
