@@ -54,6 +54,9 @@ projr_tar_pipeline_create <- function(proj_nm) {
   cat(
     "```{r ", proj_nm, "-tar_make}", "\n",
     'Sys.setenv("TAR_PROJECT" = "', proj_nm, '")', "\n",
+    'for (x in list.files(here::here("R"), pattern = "R$|r$", full.names = TRUE)) {', "\n",
+    "  source(x)", "\n",
+    "}", "\n",
     "target::tar_make()", "\n",
     "```",
     sep = ""
