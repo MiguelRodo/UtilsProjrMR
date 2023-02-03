@@ -37,8 +37,8 @@ projr_tar_pipeline_create <- function(proj_nm) {
   }
 
   tar_config_set(
-    script = file.path(dir_store, "_targets.R"),
-    store = file.path(dir_script, "_targets"),
+    script = file.path(dir_script, "_targets"),
+    store = file.path(dir_store, "_targets.R"),
     project = proj_nm
   )
   if (!file.exists(file.path(dir_script, "_targets.R"))) {
