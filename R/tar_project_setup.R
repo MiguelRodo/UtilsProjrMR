@@ -31,7 +31,7 @@ projr_tar_project_set_up <- function(proj_nm) {
   if (!dir.exists(dir_script)) {
     dir.create(dir_script, recursive = TRUE)
   }
-  targets::tar_config_set(
+  tar_config_set(
     script = file.path(dir_store, "_targets.R"),
     store = file.path(dir_script, "_targets"),
     project = proj_nm
