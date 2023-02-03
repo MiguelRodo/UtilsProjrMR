@@ -23,6 +23,10 @@ list(
     dir_output, projr_dir_get("output"),
     cue = tar_cue(mode = "always")
   ),
+  tar_target(
+    dir_bookdown, projr_dir_get("bookdown"),
+    cue = tar_cue(mode = "always")
+  ),
 
   # do something
   # ------------------
