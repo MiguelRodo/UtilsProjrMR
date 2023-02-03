@@ -11,22 +11,22 @@ projr_rprofile_hpc_renv_setup <- function() {
     "\n# make renv use scratch directory",
     'slurm_ind <- any(grepl("^SLURM_", names(Sys.getenv())))',
     'dir_exists_ind <- dir.exists(file.path("/scratch/", Sys.getenv("USER")))',
-    'if (slurm_ind && dir_exists_ind) {',
-    '  source("./scripts/hpc_renv_setup.R")',
+    "if (slurm_ind && dir_exists_ind) {",
+    '  source("./scripts/R/hpc_renv_setup.R")',
     "}"
   )
   writeLines(txt_rprofile, ".Rprofile")
-  if (!dir.exists("scripts")) {
-    dir.create("scripts")
+  if (!dir.exists(filepath("scripts", "R"))) {
+    dir.create(file.path("scripts", "R"), recursive = TRUE)
   }
   file.copy(
     system.file("scripts", "hpc_renv_setup.R", package = "UtilsProjrMR"),
-    "scripts/hpc_renv_setup.R"
+    "scripts/R/hpc_renv_setup.R"
   )
   slurm_ind <- any(grepl("^SLURM_", names(Sys.getenv())))
   dir_exists_ind <- dir.exists(file.path("/scratch/", Sys.getenv("USER")))
   if (slurm_ind && dir_exists_ind) {
-    source("./scripts/hpc_renv_setup.R")
+    source("./scripts/R/hpc_renv_setup.R")
   }
   invisible(TRUE)
 }
@@ -45,17 +45,17 @@ projr_rprofile_renv_repos <- function() {
   txt_rprofile <- c(
     txt_rprofile,
     "\n# enable renv to use binaries across OSs",
-    'source("./scripts/renv_repos.R")'
+    'source("./scripts/R/renv_repos.R")'
   )
   writeLines(txt_rprofile, ".Rprofile")
-  if (!dir.exists("scripts")) {
-    dir.create("scripts")
+  if (!dir.exists(filepath("scripts", "R"))) {
+    dir.create(file.path("scripts", "R"), recursive = TRUE)
   }
   file.copy(
     system.file("scripts", "renv_repos.R", package = "UtilsProjrMR"),
-    "scripts/renv_repos.R"
+    "scripts/R/renv_repos.R"
   )
-  source("scripts/renv_repos.R")
+  source("scripts/R/renv_repos.R")
   invisible(TRUE)
 }
 
@@ -67,16 +67,16 @@ projr_rprofile_dev <- function() {
   txt_rprofile <- c(
     txt_rprofile,
     "\n# add commonly-used dev functions and attached libraries",
-    'source("./scripts/dev.R")'
+    'source("./scripts/R/dev.R")'
   )
   writeLines(txt_rprofile, ".Rprofile")
-  if (!dir.exists("scripts")) {
-    dir.create("scripts")
+  if (!dir.exists(filepath("scripts", "R"))) {
+    dir.create(file.path("scripts", "R"), recursive = TRUE)
   }
   file.copy(
     system.file("scripts", "dev.R", package = "UtilsProjrMR"),
-    "scripts/dev.R"
+    "scripts/R/dev.R"
   )
-  source("scripts/dev.R")
+  source("scripts/R/dev.R")
   invisible(TRUE)
 }
