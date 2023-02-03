@@ -1,14 +1,17 @@
-#' @title Set up a `targets` pipeline
+#' @title Create a targets pipeline
 #'
-#' @description Attaches the \code{targets} package,
-#' configures the pipeline to exist in
-#' \code{projr_dir_get("cache", "targets", projr_nm)}
-#' and sets the system environment variable
-#' \code{TAR_PROJECT} to \code{proj_nm}.
-#' @param proj_nm character
+#' @description Creates a targets pipeline
+#' corresponding to a specific targets name.
+#' Stores the output in the temp directory,
+#' and stores the scripts in `scripts/targets`.
+#' Cats out text to add to Rmd file.
+#'
+#' @param proj_nm
+#' character.
+#' Name of project.
 #'
 #' @export
-projr_tar_project_set_up <- function(proj_nm) {
+projr_tar_pipeline_create <- function(proj_nm) {
   if (!requireNamespace("targets", quietly = TRUE)) {
     renv::install("targets")
   }
@@ -24,6 +27,7 @@ projr_tar_project_set_up <- function(proj_nm) {
   if (!requireNamespace("here", quietly = TRUE)) {
     renv::install("here")
   }
+
   library(targets)
   # set project store and script
   dir_store <- projr::projr_dir_get("cache", "targets", proj_nm)
@@ -31,6 +35,7 @@ projr_tar_project_set_up <- function(proj_nm) {
   if (!dir.exists(dir_script)) {
     dir.create(dir_script, recursive = TRUE)
   }
+
   tar_config_set(
     script = file.path(dir_store, "_targets.R"),
     store = file.path(dir_script, "_targets"),
@@ -42,11 +47,33 @@ projr_tar_project_set_up <- function(proj_nm) {
       file.path(dir_script, "_targets.R")
     )
   }
+
+  projr_tar_pipeline_activate(proj_nm = proj_nm)
+
+  print("Place the below in an Rmd file:")
+  cat(
+    "```{r ", proj_nm, "-tar_make}", "\n",
+    'Sys.setenv("TAR_PROJECT" = "', proj_nm, '")', "\n",
+    "target::tar_make()", "\n",
+    "```",
+    sep = ""
+  )
+
+  invisible(TRUE)
+}
+
+#' @title Activate a `targets` pipeline
+#'
+#' @description Sources all files in `R/` and
+#' runs `Sys.setenv("TAR_PROJECT" = <proj_nm>)`.
+#'
+#' @param proj_nm character.
+#' Name of \code{targets} pipeline (project).
+#' @export
+projr_tar_pipeline_activate <- function(proj_nm) {
   Sys.setenv("TAR_PROJECT" = proj_nm)
   for (x in list.files(here::here("R"), pattern = "R$|r$", full.names = TRUE)) {
     source(x)
   }
   invisible(TRUE)
 }
-#' @export
-projr_tar_project_setup <- projr_tar_project_set_up

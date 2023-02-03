@@ -9,7 +9,10 @@ projr_renv_dep_add(pkg)
 \arguments{
 \item{pkg}{character vector.
 Packages to add to _dependencies.R, and install
-if not already installed.}
+if not already installed.
+Can use "\if{html}{\out{<remote>}}/\if{html}{\out{<repo>}}" syntax for installing from
+(GitHub) remotes, as long as \code{<repo>} is also
+the name of the package.}
 }
 \description{
 Adds \code{library(<pkg>)} for each
