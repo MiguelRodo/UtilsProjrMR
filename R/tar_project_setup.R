@@ -26,16 +26,20 @@ projr_tar_project_set_up <- function(proj_nm) {
   }
   library(targets)
   # set project store and script
-  dir_proj <- projr::projr_dir_get("cache", "targets", proj_nm)
+  dir_store <- projr::projr_dir_get("cache", "targets", proj_nm)
+  dir_script <- file.path("scripts", "targets", proj_nm)
+  if (!dir.exists(dir_script)) {
+    dir.create(dir_script, recursive = TRUE)
+  }
   targets::tar_config_set(
-    script = file.path(dir_proj, "_targets.R"),
-    store = file.path(dir_proj, "_targets"),
+    script = file.path(dir_store, "_targets.R"),
+    store = file.path(dir_script, "_targets"),
     project = proj_nm
   )
-  if (!file.exists(file.path(dir_proj, "_targets.R"))) {
+  if (!file.exists(file.path(dir_script, "_targets.R"))) {
     file.copy(
       system.file("scripts", "_targets.R", package = "UtilsProjrMR"),
-      file.path(dir_proj, "_targets.R")
+      file.path(dir_script, "_targets.R")
     )
   }
   Sys.setenv("TAR_PROJECT" = proj_nm)
