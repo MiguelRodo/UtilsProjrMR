@@ -16,7 +16,7 @@ projr_rprofile_hpc_renv_setup <- function() {
     "}"
   )
   writeLines(txt_rprofile, ".Rprofile")
-  if (!dir.exists(filepath("scripts", "R"))) {
+  if (!dir.exists(file.path("scripts", "R"))) {
     dir.create(file.path("scripts", "R"), recursive = TRUE)
   }
   file.copy(
@@ -48,7 +48,7 @@ projr_rprofile_renv_repos <- function() {
     'source("./scripts/R/renv_repos.R")'
   )
   writeLines(txt_rprofile, ".Rprofile")
-  if (!dir.exists(filepath("scripts", "R"))) {
+  if (!dir.exists(file.path("scripts", "R"))) {
     dir.create(file.path("scripts", "R"), recursive = TRUE)
   }
   file.copy(
@@ -70,7 +70,7 @@ projr_rprofile_dev <- function() {
     'source("./scripts/R/dev.R")'
   )
   writeLines(txt_rprofile, ".Rprofile")
-  if (!dir.exists(filepath("scripts", "R"))) {
+  if (!dir.exists(file.path("scripts", "R"))) {
     dir.create(file.path("scripts", "R"), recursive = TRUE)
   }
   file.copy(
