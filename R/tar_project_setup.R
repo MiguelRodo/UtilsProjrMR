@@ -50,15 +50,11 @@ projr_tar_pipeline_create <- function(proj_nm) {
 
   projr_tar_pipeline_activate(proj_nm = proj_nm)
 
-  print("Place the below in an Rmd file:")
+  print("Place the below in the script running the `targets` pipeline:")
   cat(
-    "```{r ", proj_nm, "-tar_make}", "\n",
     'Sys.setenv("TAR_PROJECT" = "', proj_nm, '")', "\n",
-    'for (x in list.files(here::here("R"), pattern = "R$|r$", full.names = TRUE)) {', "\n",
-    "  source(x)", "\n",
-    "}", "\n",
     "targets::tar_make()", "\n",
-    "```",
+    "targets::tar_load_globals()", "\n",
     sep = ""
   )
 
