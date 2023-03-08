@@ -31,7 +31,7 @@ projr_tar_pipeline_create <- function(proj_nm) {
   library(targets)
   # set project store and script
   dir_store <- projr::projr_dir_get("cache", "targets", proj_nm)
-  dir_script <- file.path("scripts", "targets", proj_nm)
+  dir_script <- file.path(dir_script, paste0("_targets-", proj_nm, ".R"))
   if (!dir.exists(dir_script)) {
     dir.create(dir_script, recursive = TRUE)
   }
@@ -44,7 +44,7 @@ projr_tar_pipeline_create <- function(proj_nm) {
   if (!file.exists(file.path(dir_script, "_targets.R"))) {
     file.copy(
       system.file("scripts", "_targets.R", package = "UtilsProjrMR"),
-      file.path(dir_script, "_targets.R")
+      file.path(dir_script, paste0("_targets-", proj_nm, ".R"))
     )
   }
 
