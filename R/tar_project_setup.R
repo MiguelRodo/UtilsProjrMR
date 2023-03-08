@@ -30,21 +30,20 @@ projr_tar_pipeline_create <- function(proj_nm) {
 
   library(targets)
   # set project store and script
-  dir_store <- projr::projr_dir_get("cache", "targets", proj_nm)
-  dir_script <- file.path(dir_script, paste0("_targets-", proj_nm, ".R"))
-  if (!dir.exists(dir_script)) {
-    dir.create(dir_script, recursive = TRUE)
-  }
+  dir_store <- projr::projr_dir_get("cache", "targets", proj_nm, "_targets")
+  path_script <- projr::projr_path_get(
+    "project", "targets", paste0("_targets-", proj_nm, ".R")
+  )
 
   tar_config_set(
-    script = file.path(dir_script, "_targets.R"),
-    store = file.path(dir_store, "_targets"),
+    script = path_script,
+    store = dir_store,
     project = proj_nm
   )
-  if (!file.exists(file.path(dir_script, "_targets.R"))) {
+  if (!file.exists(path_script)) {
     file.copy(
       system.file("scripts", "_targets.R", package = "UtilsProjrMR"),
-      file.path(dir_script, paste0("_targets-", proj_nm, ".R"))
+      path_script
     )
   }
 
@@ -70,8 +69,6 @@ projr_tar_pipeline_create <- function(proj_nm) {
 #' @export
 projr_tar_pipeline_activate <- function(proj_nm) {
   Sys.setenv("TAR_PROJECT" = proj_nm)
-  for (x in list.files(here::here("R"), pattern = "R$|r$", full.names = TRUE)) {
-    source(x)
-  }
+  targets::tar_load_globals()
   invisible(TRUE)
 }
