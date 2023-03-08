@@ -54,7 +54,6 @@ projr_tar_pipeline_create <- function(proj_nm) {
   cat(
     'Sys.setenv("TAR_PROJECT" = "', proj_nm, '")', "\n",
     "targets::tar_make()", "\n",
-    "targets::tar_load_globals()", "\n",
     sep = ""
   )
 
