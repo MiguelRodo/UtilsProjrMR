@@ -24,7 +24,7 @@ list(
     cue = tar_cue(mode = "always")
   ),
   tar_target(
-    dir_bookdown, projr_dir_get("bookdown"),
+    dir_docs, projr_dir_get("docs"),
     cue = tar_cue(mode = "always")
   ),
 
