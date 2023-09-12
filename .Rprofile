@@ -1,3 +1,4 @@
+source("renv/activate.R")
 
 # make renv use scratch directory
 if (any(grepl("^SLURM_", names(Sys.getenv())))) {

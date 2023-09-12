@@ -1,0 +1,32 @@
+{
+  "R": {
+    "Version": "4.3.1",
+    "Repositories": [
+      {
+        "Name": "P3M",
+        "URL": "https://packagemanager.posit.co/cran/latest"
+      },
+      {
+        "Name": "CRAN",
+        "URL": "https://cloud.r-project.org"
+      }
+    ]
+  },
+  "Packages": {
+    "renv": {
+      "Package": "renv",
+      "Version": "1.0.2.9000",
+      "Source": "GitHub",
+      "RemoteType": "github",
+      "RemoteHost": "api.github.com",
+      "RemoteRepo": "renv",
+      "RemoteUsername": "rstudio",
+      "RemoteRef": "HEAD",
+      "RemoteSha": "437f165bdc7eca273e7e2e96ac5e128c6d07c181",
+      "Requirements": [
+        "utils"
+      ],
+      "Hash": "27e30407f8e9b890a9059ba177465883"
+    }
+  }
+}
