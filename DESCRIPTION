@@ -1,6 +1,6 @@
 Package: UtilsProjrMR
 Title: Assist project set-up and running
-Version: 0.0.0.9030
+Version: 0.0.0.9031
 Authors@R: 
     person("Miguel", "Rodo", , "rdxmig002@myuct.ac.za", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2036-4878"))
@@ -13,11 +13,14 @@ Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.2.3
 Suggests: 
     here,
-    projr (>= 0.0.4.9013),
+    projr,
     targets,
     ggplot2,
     tibble,
     bookdown,
-    rmarkdown
+    rmarkdown,
+    devtools,
+    languageserver,
+    jsonlite
 Remotes:  
     SATVILab/projr
