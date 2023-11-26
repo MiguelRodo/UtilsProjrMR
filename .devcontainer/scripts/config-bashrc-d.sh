@@ -1,4 +1,5 @@
 #!/usr/bin/env bash
+# Last modified: 2023 Nov 24
 
 # ensure that `.bashrc.d` files are sourced in
 if [ -e "$HOME/.bashrc" ]; then 

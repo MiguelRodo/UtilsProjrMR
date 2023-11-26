@@ -53,3 +53,12 @@ projr_cat_source_script_r <- function() {
     sep = "\n"
   )
 }
+
+#' @title Print out Markdown image command
+#' @export
+projr_cat_pandoc_image <- function(path, caption = NULL, args = NULL) {
+  prefix <- if (is.null(caption)) "![]" else paste0("![", caption, "]")
+  middle <- paste0("(", path, ")")
+  suffix <- if (is.null(args)) "" else paste0("{", args, "}")
+  cat(paste0(prefix, middle, suffix))
+}
