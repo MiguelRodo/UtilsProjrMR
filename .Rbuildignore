@@ -2,5 +2,10 @@
 ^renv\.lock$
 ^LICENSE\.md$
 ^README\.Rmd$
-^scripts/
 ^README\.html$
+^_dependencies\.R$
+^\.devcontainer$
+^repos-to-clone\.list$
+^\.gitpod\.yml$
+^\.Renviron$
+^EntireProject\.code-workspace$
