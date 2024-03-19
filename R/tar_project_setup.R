@@ -30,7 +30,7 @@ projr_tar_pipeline_create <- function(proj_nm) {
 
   library(targets)
   # set project store and script
-  dir_store <- projr::projr_dir_get("cache", "targets", proj_nm, "_targets")
+  dir_store <- projr::projr_path_get_dir("cache", "targets", proj_nm, "_targets")
   path_script <- projr::projr_path_get(
     "project", "targets", paste0("_targets-", proj_nm, ".R")
   )
