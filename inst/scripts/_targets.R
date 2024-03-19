@@ -12,19 +12,19 @@ list(
   # specify _projr directories
   # ------------------
   tar_target(
-    dir_data_raw, projr_dir_get("data-raw"),
+    dir_data_raw, projr::projr_path_get_dir("data-raw"),
     cue = tar_cue(mode = "always")
   ),
   tar_target(
-    dir_cache, projr_dir_get("cache"),
+    dir_cache, projr::projr_path_get_dir("cache"),
     cue = tar_cue(mode = "always")
   ),
   tar_target(
-    dir_output, projr_dir_get("output"),
+    dir_output, projr::projr_path_get_dir("output"),
     cue = tar_cue(mode = "always")
   ),
   tar_target(
-    dir_docs, projr_dir_get("docs"),
+    dir_docs, projr::projr_path_get_dir("docs"),
     cue = tar_cue(mode = "always")
   ),
 

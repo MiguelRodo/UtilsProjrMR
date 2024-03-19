@@ -18,6 +18,6 @@ echo "<job>"
 # - to build the whole project or do anything else, 
 # just replace the code after sourcing .Rprofile with what you want
 # singularity exec $sif/ar422.sif Rscript -e "source('.Rprofile'); bookdown::preview_chapter('<rmd>.Rmd')"
-# singularity exec $sif/ar422.sif Rscript -e "source('.Rprofile'); rmarkdown::render('<rmd>.Rmd', output_file = projr_dir_get('cache', 'pipeline-expr.html'), run_pandoc = FALSE)"
+# singularity exec $sif/ar422.sif Rscript -e "source('.Rprofile'); rmarkdown::render('<rmd>.Rmd', output_file = projr::projr_path_get_dir('cache', 'pipeline-expr.html'), run_pandoc = FALSE)"
 
 date
