@@ -35,6 +35,7 @@ projr_renv_dep_add <- function(pkg) {
 }
 
 #' @title Restore
+#' @export
 projr_renv_restore_update <- function(restore_gh = TRUE) {
   lockfile_list_pkg <- renv::lockfile_read()$Package
   pkg_vec <- NULL
