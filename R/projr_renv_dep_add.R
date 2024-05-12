@@ -44,7 +44,7 @@ projr_renv_restore_update <- function(restore_gh = TRUE) {
   invisible(TRUE)
 }
 
-.projr_renv_restore_update(pkg, restore_gh) {
+.projr_renv_restore_update <- function(pkg, restore_gh) {
   if (restore_gh) {
     .projr_renv_restore_update_restore_gh(pkg)
   } else {
