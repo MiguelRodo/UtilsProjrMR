@@ -37,6 +37,23 @@ projr_renv_dep_add <- function(pkg) {
 #' @title Restore
 #' @export
 projr_renv_restore_update <- function(restore_gh = TRUE) {
+
+  .projr_renv_lockfile_pkg_get() |>
+    .projr_renv_restore_update(restore_gh = restore_gh)
+
+  invisible(TRUE)
+}
+
+.projr_renv_restore_update(pkg, restore_gh) {
+  if (restore_gh) {
+    .projr_renv_restore_update_restore_gh(pkg)
+  } else {
+    .projr_renv_restore_update_restore_gh_n(pkg)
+  }
+  invisible(TRUE)
+}
+
+.projr_renv_lockfile_pkg_get <- function() {
   lockfile_list_pkg <- renv::lockfile_read()$Package
   pkg_vec <- NULL
   for (i in seq_along(lockfile_list_pkg)) {
@@ -49,13 +66,21 @@ projr_renv_restore_update <- function(restore_gh = TRUE) {
       pkg_vec <- c(pkg_vec, paste0(remote_username, "/", pkg))
     }
   }
-  if (restore_gh) {
-    pkg_vec_non_gh <- pkg_vec[!grepl("/", pkg_vec)]
-    pkg_vec_gh <- pkg_vec[grepl("/", pkg_vec)]
-    renv::install(pkg_vec_non_gh)
-    renv::restore(pkg_vec_gh)
-  } else {
-    renv::install(pkg_vec)
+  pkg_vec
+}
+
+.projr_renv_restore_update_restore_gh <- function(pkg) {
+  pkg_non_gh <- pkg[!grepl("/", pkg)]
+  pkg_gh <- pkg[grepl("/", pkg)]
+  if (length(pkg_non_gh) > 0) {
+    renv::install(pkg_non_gh, prompt = FALSE)
+  }
+  for (i in seq_along(pkg_gh)) {
+    renv::install(pkg_gh[i], prompt = FALSE)
   }
   invisible(TRUE)
-} 
+}
+
+.projr_renv_restore_update_restore_gh_n <- function(pkg) {
+  renv::install(pkg, prompt = FALSE)
+}
