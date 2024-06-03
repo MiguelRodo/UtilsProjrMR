@@ -34,51 +34,80 @@ projr_renv_dep_add <- function(pkg) {
   invisible(TRUE)
 }
 
-#' @title Restore
+#' @title Restore Renv Environment with Updates
+#' @param restore_gh Logical. Whether to restore packages from GitHub.
 #' @export
 projr_renv_restore_update <- function(restore_gh = TRUE) {
-
-  .projr_renv_lockfile_pkg_get() |>
-    .projr_renv_restore_update(restore_gh = restore_gh)
-
+  packages <- .projr_renv_lockfile_pkg_get()
+  .projr_renv_restore_update_impl(packages, restore_gh)
   invisible(TRUE)
 }
 
-.projr_renv_restore_update <- function(pkg, restore_gh) {
+# Renamed for clarity
+.projr_renv_restore_update_impl <- function(packages, restore_gh) {
   if (restore_gh) {
-    .projr_renv_restore_update_restore_gh(pkg)
+    .projr_renv_restore_update_restore_gh(packages)
   } else {
-    .projr_renv_restore_update_restore_gh_n(pkg)
+    .projr_renv_install(packages)
   }
   invisible(TRUE)
 }
 
 .projr_renv_lockfile_pkg_get <- function() {
   lockfile_list_pkg <- renv::lockfile_read()$Package
-  pkg_vec <- NULL
-  for (i in seq_along(lockfile_list_pkg)) {
-    pkg_list <- lockfile_list_pkg[[i]]
-    pkg <- pkg_list$Package
-    remote_username <- pkg_list$RemoteUsername
+  package_names <- c() 
+  for (package_index in seq_along(lockfile_list_pkg)) {
+    package_info <- lockfile_list_pkg[[package_index]]
+    package_name <- package_info$Package
+    remote_username <- package_info$RemoteUsername
     if (is.null(remote_username)) {
-      pkg_vec <- c(pkg, pkg_vec)
+      package_names <- c(package_name, package_names)
     } else {
-      pkg_vec <- c(pkg_vec, paste0(remote_username, "/", pkg))
+      package_names <- c(package_names, paste0(remote_username, "/", package_name))
     }
   }
-  pkg_vec
+  package_names
 }
 
 .projr_renv_restore_update_restore_gh <- function(pkg) {
   pkg_non_gh <- pkg[!grepl("/", pkg)]
   pkg_gh <- pkg[grepl("/", pkg)]
   if (length(pkg_non_gh) > 0) {
-    renv::install(pkg_non_gh, prompt = FALSE)
+    .projr_renv_install(pkg_non_gh)
   }
   for (i in seq_along(pkg_gh)) {
-    renv::install(pkg_gh[i], prompt = FALSE)
+    .projr_renv_restore_ind(pkg_gh[i])
   }
   invisible(TRUE)
+}
+
+.projr_renv_install <- function(pkgs) { 
+  tryCatch(
+    renv::install(pkgs, prompt = FALSE),  # Install all packages at once
+    error = function(e) {
+      for (pkg in pkgs) {                # If error, install each package individually
+        .projr_renv_install_ind(pkg)
+      }
+    }
+  )
+}
+
+.projr_renv_install_ind <- function(pkg) {
+  tryCatch(
+    renv::install(pkg, prompt = FALSE),
+    error = function(e) {
+      warning(paste0("Failed to install ", pkg))
+    }
+  )
+}
+
+.projr_renv_restore_ind <- function(pkg) {
+  tryCatch(
+    renv::restore(pkg, prompt = FALSE),
+    error = function(e) {
+      warning(paste0("Failed to restore ", pkg))
+    }
+  
 }
 
 .projr_renv_restore_update_restore_gh_n <- function(pkg) {
