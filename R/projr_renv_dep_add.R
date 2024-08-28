@@ -103,7 +103,7 @@ projr_renv_restore_update <- function(restore_gh = TRUE) {
 
 .projr_renv_restore_ind <- function(pkg) {
   tryCatch(
-    renv::restore(pkg, prompt = FALSE),
+    renv::restore(pkg, prompt = FALSE, transactional = TRUE),
     error = function(e) {
       warning(paste0("Failed to restore ", pkg))
     }
