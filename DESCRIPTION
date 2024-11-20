@@ -21,6 +21,7 @@ Suggests:
     rmarkdown,
     devtools,
     languageserver,
-    jsonlite
+    jsonlite,
+    cli
 Remotes:  
     SATVILab/projr
