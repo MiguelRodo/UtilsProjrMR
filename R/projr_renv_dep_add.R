@@ -95,7 +95,10 @@ projr_renv_restore_update <- function(restore_gh = TRUE) {
 
 .projr_renv_install_ind <- function(pkg) {
   tryCatch(
-    renv::install(pkg, prompt = FALSE),
+    if (!requireNamespace(pkg, quietly = TRUE)) {
+      renv::install(pkg, prompt = FALSE)
+    }
+    ,
     error = function(e) {
       warning(paste0("Failed to install ", pkg))
     }
