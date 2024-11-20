@@ -135,7 +135,11 @@ projr_renv_restore_update <- function(restore_non_gh = TRUE,
   if (length(pkg) == 0L) {
     return(invisible(FALSE))
   }
-  
+  if (is_bioc) {
+    if (!requireNamespace("BiocManager", quietly = TRUE)) {
+      renv::install("BiocManager", prompt = FALSE)
+    }
+  }
   # Extract package names from possible remotes
   pkg_names <- sapply(pkg, function(x) sub("^.*/", "", x))
   
