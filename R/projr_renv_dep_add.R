@@ -59,12 +59,12 @@ projr_renv_dep_add <- function(pkg) {
 #' If a Bioconductor package needs to be installed, then 
 #' if \code{TRUE} it will use \code{BiocManager::install}, otherwise
 #' it will use \code{renv::install("bioc::<package_name>")}.
-#' Default is \code{TRUE}.
+#' Default is \code{FALSE}.
 #'
 #' @export
 projr_renv_restore_update <- function(restore_non_gh = TRUE,
                                       restore_gh = TRUE,
-                                      biocmanager_install = TRUE) {
+                                      biocmanager_install = FALSE) {
   package_list <- .projr_renv_lockfile_pkg_get()
   .projr_renv_restore_update_impl(
     package_list,
