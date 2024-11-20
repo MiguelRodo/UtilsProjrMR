@@ -54,6 +54,7 @@ projr_renv_restore_update <- function(restore_gh = TRUE) {
 }
 
 .projr_renv_lockfile_pkg_get <- function() {
+  renv::activate()
   lockfile_list_pkg <- renv::lockfile_read()$Package
   package_names <- c() 
   for (package_index in seq_along(lockfile_list_pkg)) {
