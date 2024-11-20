@@ -35,85 +35,122 @@ projr_renv_dep_add <- function(pkg) {
 }
 
 #' @title Restore Renv Environment with Updates
-#' @param restore_gh Logical. Whether to restore packages from GitHub.
+#' @param restore_non_gh logical. Wether to restore packages not from GitHub,
+#' or install the latest version.
+#' Default is `TRUE`.
+#' @param restore_gh logical. Whether to restore packages from GitHub,
+#' or install the latest version. Default is `TRUE`.
+#' @param biocmanager_install logical.
+#' If a BioConductor package needs to be installed, then 
+#' if TRUE it will use `BiocManager::install`, otherwise
+#  it will use `renv::install(bioc::<package_name>)`.
+#' Default is `TRUE`.
 #' @export
-projr_renv_restore_update <- function(restore_gh = TRUE) {
-  packages <- .projr_renv_lockfile_pkg_get()
-  .projr_renv_restore_update_impl(packages, restore_gh)
-  invisible(TRUE)
-}
-
-# Renamed for clarity
-.projr_renv_restore_update_impl <- function(packages, restore_gh) {
-  if (restore_gh) {
-    .projr_renv_restore_update_restore_gh(packages)
-  } else {
-    .projr_renv_install(packages)
-  }
+projr_renv_restore_update <- function(restore_non_gh = TRUE,
+                                      restore_gh = TRUE,
+                                      biocmanager_install = TRUE) {
+  package_list <- .projr_renv_lockfile_pkg_get()
+  .projr_renv_restore_update_impl(package_list, restore_non_gh, restore_gh)
   invisible(TRUE)
 }
 
 .projr_renv_lockfile_pkg_get <- function() {
   renv::activate()
   lockfile_list_pkg <- renv::lockfile_read()$Package
-  package_names <- c() 
+  package_names <- c()
+  pkg_vec_regular <- NULL
+  pkg_vec_bioc <- NULL
+  pkg_vec_gh <- NULL
   for (package_index in seq_along(lockfile_list_pkg)) {
     package_info <- lockfile_list_pkg[[package_index]]
     package_name <- package_info$Package
     remote_username <- package_info$RemoteUsername
     if (is.null(remote_username)) {
-      package_names <- c(package_name, package_names)
+      is_bioc <- grepl("bioc", tolower(package_index$Source))
+      if (is_bioc) {
+        pkg_vec_bioc <- c(pkg_vec_bioc, package_name)
+      } else {
+        pkg_vec_regular <- c(pkg_vec_regular, package_name)
+      }
     } else {
-      package_names <- c(package_names, paste0(remote_username, "/", package_name))
+      pkg_vec_gh <- c(pkg_vec_gh, paste0(remote_username, "/", package_name))
     }
   }
-  package_names
+  list(
+    "regular" = pkg_vec_regular,
+    "bioc" = pkg_vec_bioc,
+    "gh" = pkg_vec_gh
+  )
 }
 
-.projr_renv_restore_update_restore_gh <- function(pkg) {
-  pkg_non_gh <- pkg[!grepl("/", pkg)]
-  pkg_gh <- pkg[grepl("/", pkg)]
-  if (length(pkg_non_gh) > 0) {
-    .projr_renv_install(pkg_non_gh)
-  }
-  for (i in seq_along(pkg_gh)) {
-    .projr_renv_restore_ind(pkg_gh[i])
-  }
+# Renamed for clarity
+#' @param biocmanager_install logical.
+.projr_renv_restore_update_impl <- function(package_list,
+                                            restore_non_gh,
+                                            restore_gh,
+                                            biocmanager_install) {
+   .projr_renv_restore_update_actual(
+      package_list[["regular"]], restore_non_gh, FALSE, FALSE
+    )
+   .projr_renv_restore_update_actual(
+      package_list[["bioc"]], restore_non_gh, biocmanager_install, TRUE
+    )
+   .projr_renv_restore_update_actual(
+      package_list[["gh"]], restore_gh, FALSE, FALSE
+    )
   invisible(TRUE)
 }
 
-.projr_renv_install <- function(pkgs) { 
+.projr_renv_restore_update_actual <- function(pkg, restore, biocmanager_install, is_bioc) {
+  if (length(pkg) == 0L) {
+    return(invisible(FALSE))
+  }
+  if (restore) {
+    try(renv::restore(packages = sapply(pkg, basename), transactional = FALSE))
+    .projr_renv_restore_remaining(sapply(pkg, basename))
+  } else {
+    .projr_renv_install(pkg, biocmanager_install, is_bioc)
+  }
+  .projr_renv_install_remaining(pkg, biocmanager_install, is_bioc)
+  invisible(TRUE)
+}
+
+.projr_renv_restore_remaining <- function(pkg) {
+  pkg_remaining <- pkg[!pkg %in% installed.packages()]
+  if (is.null(pkg_remaining) || length(pkg_remaining) == 0L) {
+    return(invisible(FALSE))
+  }
+  for (x in pkg_remaining) {
+    if (!requireNamespace(x, quietly = TRUE)) {
+      renv::restore(packages = x, transactional = FALSE)
+    }
+  }
+}
+
+.projr_renv_install <- function(pkg, biocmanager_install, is_bioc) { 
   tryCatch(
-    renv::install(pkgs, prompt = FALSE),  # Install all packages at once
-    error = function(e) {
-      for (pkg in pkgs) {                # If error, install each package individually
-        .projr_renv_install_ind(pkg)
+    if (biocmanager_install) {
+      BiocManager::install(pkg, update = TRUE)
+    } else {
+      if (is_bioc) {
+        renv::install(paste0("bioc::", pkg), prompt = FALSE)
+      } else {
+        renv::install(pkg, prompt = FALSE)
       }
     }
   )
 }
 
-.projr_renv_install_ind <- function(pkg) {
-  tryCatch(
-    if (!requireNamespace(pkg, quietly = TRUE)) {
-      renv::install(pkg, prompt = FALSE)
+.projr_renv_install_remaining <- function(pkg, biocmanager_install, is_bioc) {
+  pkg_remaining <- pkg[!pkg %in% installed.packages()]
+  if (is.null(pkg_remaining) || length(pkg_remaining) == 0L) {
+    return(invisible(FALSE))
+  }
+  .projr_renv_install(pkg_remaining, biocmanager_install, is_bioc)
+  for (x in pkg_remaining) {
+    if (!requireNamespace(x, quietly = TRUE)) {
+      .projr_renv_install(x, biocmanager_install, is_bioc)
     }
-    ,
-    error = function(e) {
-      warning(paste0("Failed to install ", pkg))
-    }
-  )
+  }
 }
 
-.projr_renv_restore_ind <- function(pkg) {
-  tryCatch(
-    renv::restore(pkg, prompt = FALSE, transactional = TRUE),
-    error = function(e) {
-      warning(paste0("Failed to restore ", pkg))
-    }
-  )
-}
-
-.projr_renv_restore_update_restore_gh_n <- function(pkg) {
-  renv::install(pkg, prompt = FALSE)
-}
