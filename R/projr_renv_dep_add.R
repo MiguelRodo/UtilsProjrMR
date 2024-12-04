@@ -36,10 +36,10 @@ projr_renv_dep_add <- function(pkg) {
   # Read or create _dependencies.R file
   if (file.exists("_dependencies.R")) {
     txt_dep <- readLines("_dependencies.R")
-    cli::cli_alert_info("Reading existing 'dependencies.R' file.")
+    cli::cli_alert_info("Reading existing '_dependencies.R' file.")
   } else {
     txt_dep <- character()
-    cli::cli_alert_info("Creating new 'dependencies.R' file.")
+    cli::cli_alert_info("Creating new '_dependencies.R' file.")
   }
 
   # Add library calls for each package
@@ -54,14 +54,14 @@ projr_renv_dep_add <- function(pkg) {
 
   if (length(new_lib_calls) > 0) {
     txt_dep <- c(txt_dep, new_lib_calls)
-    cli::cli_alert_success("Adding library calls to 'dependencies.R' for packages: {.pkg {pkg_names}}")
+    cli::cli_alert_success("Adding library calls to '_dependencies.R' for packages: {.pkg {pkg_names}}")
   } else {
-    cli::cli_alert_info("No new library calls to add to 'dependencies.R'.")
+    cli::cli_alert_info("No new library calls to add to '_dependencies.R'.")
   }
 
   # Write updated dependencies to _dependencies.R
   writeLines(txt_dep, "_dependencies.R")
-  cli::cli_alert_success("'dependencies.R' has been updated.")
+  cli::cli_alert_success("'_dependencies.R' has been updated.")
   invisible(TRUE)
 }
 
@@ -99,8 +99,8 @@ projr_renv_dep_add <- function(pkg) {
 #'
 #' @export
 #' @rdname projr_renv_restore
-projr_renv_restore_or_update <- function(restore_non_gh = TRUE,
-                                         restore_gh = TRUE,
+projr_renv_restore_or_update <- function(restore_gh = TRUE,
+                                         restore_non_gh = TRUE,
                                          biocmanager_install = FALSE) {
   # Ensure the cli package is available
   if (!requireNamespace("cli", quietly = TRUE)) {
@@ -339,7 +339,9 @@ projr_renv_restore_or_update <- function(restore_non_gh = TRUE,
 
 #' @rdname projr_renv_install
 #' @export
-projr_renv_restore <- function(biocmanager_install = FALSE) {
+projr_renv_restore <- function(github = TRUE,
+                               non_github = TRUE,
+                               biocmanager_install = FALSE) {
   projr_renv_restore_or_update(
     restore_non_gh = FALSE,
     restore_gh = FALSE,
@@ -349,7 +351,9 @@ projr_renv_restore <- function(biocmanager_install = FALSE) {
 
 #' @rdname projr_renv_install
 #' @export
-projr_renv_update <- function(biocmanager_install = FALSE) {
+projr_renv_update <- function(github = TRUE,
+                              non_github = TRUE,
+                              biocmanager_install = FALSE) {
   projr_renv_restore_or_update(
     restore_non_gh = FALSE,
     restore_gh = FALSE,
@@ -359,7 +363,9 @@ projr_renv_update <- function(biocmanager_install = FALSE) {
 
 #' @rdname projr_renv_install
 #' @export
-projr_renv_restore_and_update <- function(biocmanager_install = FALSE) {
-  projr_renv_restore(biocmanager_install)
-  projr_renv_update(biocmanager_install)
+projr_renv_restore_and_update <- function(github = TRUE,
+                                          non_github = TRUE,
+                                          biocmanager_install = FALSE) {
+  projr_renv_restore(github, non_github, biocmanager_install)
+  projr_renv_update(!github, !non_github, biocmanager_install)
 }
