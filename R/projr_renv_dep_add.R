@@ -36,10 +36,10 @@ projr_renv_dep_add <- function(pkg) {
   # Read or create _dependencies.R file
   if (file.exists("_dependencies.R")) {
     txt_dep <- readLines("_dependencies.R")
-    cli::cli_alert_info("Reading existing {_dependencies.R} file.")
+    cli::cli_alert_info("Reading existing 'dependencies.R' file.")
   } else {
     txt_dep <- character()
-    cli::cli_alert_info("Creating new {_dependencies.R} file.")
+    cli::cli_alert_info("Creating new 'dependencies.R' file.")
   }
 
   # Add library calls for each package
@@ -54,21 +54,38 @@ projr_renv_dep_add <- function(pkg) {
 
   if (length(new_lib_calls) > 0) {
     txt_dep <- c(txt_dep, new_lib_calls)
-    cli::cli_alert_success("Adding library calls to {_dependencies.R} for packages: {.pkg {pkg_names}}")
+    cli::cli_alert_success("Adding library calls to 'dependencies.R' for packages: {.pkg {pkg_names}}")
   } else {
-    cli::cli_alert_info("No new library calls to add to {_dependencies.R}.")
+    cli::cli_alert_info("No new library calls to add to 'dependencies.R'.")
   }
 
   # Write updated dependencies to _dependencies.R
   writeLines(txt_dep, "_dependencies.R")
-  cli::cli_alert_success("{_dependencies.R} has been updated.")
+  cli::cli_alert_success("'dependencies.R' has been updated.")
   invisible(TRUE)
 }
 
-#' @title Restore renv Environment with Updates
+#' @title Restore or update `renv` lockfile packages
 #'
 #' @description Restores the renv environment, with options to update
 #' packages from GitHub and Bioconductor, or to install the latest versions.
+#'
+#' `projr_renv_restore` restores packages from the lockfile,
+#' and attempts to install the latest available version
+#' for packages for which restoration failed.
+#' 
+#' `projr_renv_update` installs the latest available
+#' versions of all packages in the lockfile.
+#'
+#' `projr_renv_restore_and_update` both restores
+#' the lockfile versions and the latest versions.
+#'
+#' `projr_renv_restore_or_update` is more flexible than
+#' `projr_renv_restore` and `projr_renv_install`, as
+#' as it may either restore or update, will update packages if restoration
+#  failed, and allows restoration or updation to depend on whether the 
+#  package is from GitHub or not.
+#
 #'
 #' @param restore_non_gh Logical. Whether to restore packages not from GitHub
 #' or install the latest version. Default is \code{TRUE}.
@@ -81,12 +98,13 @@ projr_renv_dep_add <- function(pkg) {
 #' Default is \code{FALSE}.
 #'
 #' @export
-projr_renv_restore_update <- function(restore_non_gh = TRUE,
-                                      restore_gh = TRUE,
-                                      biocmanager_install = FALSE) {
+#' @rdname projr_renv_restore
+projr_renv_restore_or_update <- function(restore_non_gh = TRUE,
+                                         restore_gh = TRUE,
+                                         biocmanager_install = FALSE) {
   # Ensure the cli package is available
   if (!requireNamespace("cli", quietly = TRUE)) {
-    install.packages("cli")
+    try(install.packages("cli"))
   }
 
   cli::cli_h1("Starting renv environment restoration/update")
@@ -139,7 +157,7 @@ projr_renv_restore_update <- function(restore_non_gh = TRUE,
                                             biocmanager_install) {
   # Ensure the cli package is available
   if (!requireNamespace("cli", quietly = TRUE)) {
-    install.packages("cli")
+    try(install.packages("cli"))
   }
 
   if (restore_non_gh) {
@@ -202,7 +220,7 @@ projr_renv_restore_update <- function(restore_non_gh = TRUE,
   if (restore) {
     cli::cli_alert_info("Attempting to restore {pkg_type} packages: {.pkg {pkg_names}}")
     # Attempt to restore packages
-    renv::restore(packages = pkg_names, transactional = FALSE)
+    try(renv::restore(packages = pkg_names, transactional = FALSE))
     cli::cli_alert_info("Checking for packages that failed to restore.")
     .projr_renv_restore_remaining(pkg_names)
   } else {
@@ -220,7 +238,7 @@ projr_renv_restore_update <- function(restore_non_gh = TRUE,
 .projr_renv_restore_remaining <- function(pkg) {
   # Ensure the cli package is available
   if (!requireNamespace("cli", quietly = TRUE)) {
-    install.packages("cli")
+    try(install.packages("cli"))
   }
 
   installed_pkgs <- rownames(installed.packages())
@@ -236,7 +254,7 @@ projr_renv_restore_update <- function(restore_non_gh = TRUE,
 
   for (x in pkg_remaining) {
     if (!requireNamespace(x, quietly = TRUE)) {
-      renv::restore(packages = x, transactional = FALSE)
+      try(renv::restore(packages = x, transactional = FALSE))
     }
   }
 }
@@ -244,27 +262,27 @@ projr_renv_restore_update <- function(restore_non_gh = TRUE,
 .projr_renv_install <- function(pkg, biocmanager_install, is_bioc) {
   # Ensure the cli package is available
   if (!requireNamespace("cli", quietly = TRUE)) {
-    install.packages("cli")
+    try(install.packages("cli"))
   }
 
   if (is_bioc) {
     if (biocmanager_install) {
       cli::cli_alert_info("Installing Bioconductor packages using BiocManager: {.pkg {pkg}}")
-      BiocManager::install(pkg, update = TRUE, ask = FALSE)
+      try(BiocManager::install(pkg, update = TRUE, ask = FALSE))
     } else {
       cli::cli_alert_info("Installing Bioconductor packages using renv: {.pkg {pkg}}")
-      renv::install(paste0("bioc::", pkg), prompt = FALSE)
+      try(renv::install(paste0("bioc::", pkg), prompt = FALSE))
     }
   } else {
     cli::cli_alert_info("Installing packages: {.pkg {pkg}}")
-    renv::install(pkg, prompt = FALSE)
+    try(renv::install(pkg, prompt = FALSE))
   }
 }
 
 .projr_renv_install_remaining <- function(pkg, biocmanager_install, is_bioc) {
   # Ensure the cli package is available
   if (!requireNamespace("cli", quietly = TRUE)) {
-    install.packages("cli")
+    try(install.packages("cli"))
   }
 
   installed_pkgs <- rownames(installed.packages())
@@ -317,4 +335,31 @@ projr_renv_restore_update <- function(restore_non_gh = TRUE,
   } else {
     cli::cli_alert_danger("Some packages failed to install: {.pkg {pkg_final_missing}}")
   }
+}
+
+#' @rdname projr_renv_install
+#' @export
+projr_renv_restore <- function(biocmanager_install = FALSE) {
+  projr_renv_restore_or_update(
+    restore_non_gh = FALSE,
+    restore_gh = FALSE,
+    biocmanager_install = biocmanager_install
+  )
+}
+
+#' @rdname projr_renv_install
+#' @export
+projr_renv_update <- function(biocmanager_install = FALSE) {
+  projr_renv_restore_or_update(
+    restore_non_gh = FALSE,
+    restore_gh = FALSE,
+    biocmanager_install = biocmanager_install
+  )
+}
+
+#' @rdname projr_renv_install
+#' @export
+projr_renv_restore_and_update <- function(biocmanager_install = FALSE) {
+  projr_renv_restore(biocmanager_install)
+  projr_renv_update(biocmanager_install)
 }
