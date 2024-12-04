@@ -1,14 +1,22 @@
-#' @title Adds a package to _dependencies.R file for renv to pick up
+#' @title Add Packages to `_dependencies.R` for renv
 #'
-#' @description Adds \code{library(<pkg>)} for each
-#' package listed. Installs them if they're not already installed.
+#' @description
+#' Adds `library(<pkg>)` calls for each package listed to the `_dependencies.R` file. Installs packages if they are not already installed.
 #'
 #' @param pkg Character vector.
-#' Packages to add to \code{_dependencies.R}, and install
-#' if not already installed.
-#' Can use "<remote>/<repo>" syntax for installing from
-#' (e.g., GitHub) remotes, as long as \code{<repo>} is also
-#' the name of the package.
+#' Packages to add to `_dependencies.R`, and install if not already installed.
+#' Can use "`<remote>/<repo>`" syntax for installing from remotes (e.g., GitHub), as long as `<repo>` is also the name of the package.
+#'
+#' @return Invisibly returns `TRUE` upon successful completion.
+#'
+#' @examples
+#' \dontrun{
+#' # Add and install CRAN packages
+#' projr_renv_dep_add(c("dplyr", "ggplot2"))
+#'
+#' # Add and install a GitHub package
+#' projr_renv_dep_add("hadley/httr")
+#' }
 #'
 #' @export
 projr_renv_dep_add <- function(pkg) {
@@ -96,23 +104,62 @@ projr_renv_dep_add <- function(pkg) {
 #' Default is \code{FALSE}.
 #'
 #' @export
-#' @rdname projr_renv_restore
-projr_renv_restore_or_update <- function(restore_gh = TRUE,
-                                         restore_non_gh = TRUE,
-                                         biocmanager_install = FALSE) {
+#' @rdname projr_renv_restore_or_update
+projr_renv_restore <- function(github = TRUE,
+                               non_github = TRUE,
+                               biocmanager_install = FALSE) {
+  .check_renv()
   .ensure_cli()
 
-  cli::cli_h1("Starting renv environment restoration/update")
+  cli::cli_h1("Starting renv environment restoration")
 
   package_list <- .projr_renv_lockfile_pkg_get()
-  .projr_renv_restore_update_impl(
-    package_list,
-    restore_non_gh,
-    restore_gh,
-    biocmanager_install
+  .projr_renv_restore_or_update_impl(
+    package_list = package_list,
+    non_github = non_github,
+    github = github,
+    restore = TRUE,
+    biocmanager_install = biocmanager_install
   )
-  cli::cli_h1("renv environment restoration/update completed")
+  cli::cli_h1("renv environment restoration completed")
   invisible(TRUE)
+}
+
+#' @export
+#' @rdname projr_renv_restore_or_update
+projr_renv_update <- function(github = TRUE,
+                              non_github = TRUE,
+                              biocmanager_install = FALSE) {
+  .check_renv()
+  .ensure_cli()
+
+  cli::cli_h1("Starting renv environment restoration")
+
+  package_list <- .projr_renv_lockfile_pkg_get()
+  .projr_renv_restore_or_update_impl(
+    package_list = package_list,
+    non_github = non_github,
+    github = github,
+    restore = FALSE,
+    biocmanager_install = biocmanager_install
+  )
+  cli::cli_h1("renv environment restoration completed")
+  invisible(TRUE)
+}
+
+#' @export
+#' @rdname projr_renv_restore_and_update
+projr_renv_restore_and_update <- function(github = TRUE,
+                                          non_github = TRUE,
+                                          biocmanager_install = FALSE) {
+  projr_renv_restore(github, non_github, biocmanager_install)
+  projr_renv_update(github, non_github, biocmanager_install)
+}
+
+.check_renv <- function() {
+  if (!requireNamespace("renv", quietly = TRUE)) {
+    stop("renv is required")
+  }
 }
 
 .ensure_cli <- function() {
@@ -152,53 +199,54 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
   )
 }
 
-.projr_renv_restore_update_impl <- function(package_list,
-                                            restore_non_gh,
-                                            restore_gh,
-                                            biocmanager_install) {
-  # Ensure the cli package is available
-  .ensure_cli()
-
-  if (restore_non_gh) {
-    cli::cli_alert_info("Restoring CRAN packages.")
-  } else {
-    cli::cli_alert_info("Installing latest versions of CRAN packages.")
-  }
-  .projr_renv_restore_update_actual(
-    package_list[["regular"]],
-    restore_non_gh,
-    biocmanager_install,
-    is_bioc = FALSE
+.projr_renv_restore_or_update_impl <- function(package_list,
+                                               github,
+                                               non_github,
+                                               restore,
+                                               biocmanager_install) {
+  .projr_renv_restore_or_update_actual_wrapper(
+    pkg = package_list[["regular"]],
+    act = non_github,
+    restore = restore,
+    source = "CRAN",
+    biocmanager_install = biocmanager_install
   )
-
-  if (length(package_list[["bioc"]]) > 0) {
-    if (restore_non_gh) {
-      cli::cli_alert_info("Restoring Bioconductor packages.")
-    } else {
-      cli::cli_alert_info("Installing latest versions of Bioconductor packages.")
-    }
-    .projr_renv_restore_update_actual(
-      package_list[["bioc"]],
-      restore_non_gh,
-      biocmanager_install,
-      is_bioc = TRUE
-    )
-  } else {
-    cli::cli_alert_info("No Bioconductor packages to process.")
-  }
-
-  if (restore_gh) {
-    cli::cli_alert_info("Restoring GitHub packages.")
-  } else {
-    cli::cli_alert_info("Installing latest versions of GitHub packages.")
-  }
-  .projr_renv_restore_update_actual(
-    package_list[["gh"]],
-    restore_gh,
-    biocmanager_install,
-    is_bioc = FALSE
+  .projr_renv_restore_or_update_actual_wrapper(
+    pkg = package_list[["bioc"]],
+    act = non_github,
+    restore = restore,
+    source = "BioConductor",
+    biocmanager_install = biocmanager_install
+  )
+  .projr_renv_restore_or_update_actual_wrapper(
+    pkg = package_list[["bioc"]],
+    act = github,
+    restore = restore,
+    source = "GitHub",
+    biocmanager_install = biocmanager_install
   )
   invisible(TRUE)
+}
+
+.projr_renv_restore_or_update_actual_wrapper <- function(pkg,
+                                                         act,
+                                                         restore,
+                                                         source,
+                                                         biocmanager_install) {
+  if (act) {
+    action <- if (restore) "Restoring" else "Installing latest"
+    cli::cli_alert_info(sprintf("%s %s packages.", action, source))
+
+    .projr_renv_restore_update_actual(
+      pkg,
+      restore,
+      biocmanager_install,
+      is_bioc = source == "BioConductor"
+    )
+  } else {
+    action <- if (restore) "restoring" else "installing"
+    cli::cli_alert_info(sprintf("Skipping %s %s packages.", action, source))
+  }
 }
 
 .projr_renv_restore_update_actual <- function(pkg, restore, biocmanager_install, is_bioc) {
@@ -326,37 +374,4 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
   } else {
     cli::cli_alert_danger("Some packages failed to install: {.pkg {pkg_final_missing}}")
   }
-}
-
-#' @rdname projr_renv_install
-#' @export
-projr_renv_restore <- function(github = TRUE,
-                               non_github = TRUE,
-                               biocmanager_install = FALSE) {
-  projr_renv_restore_or_update(
-    restore_non_gh = FALSE,
-    restore_gh = FALSE,
-    biocmanager_install = biocmanager_install
-  )
-}
-
-#' @rdname projr_renv_install
-#' @export
-projr_renv_update <- function(github = TRUE,
-                              non_github = TRUE,
-                              biocmanager_install = FALSE) {
-  projr_renv_restore_or_update(
-    restore_non_gh = FALSE,
-    restore_gh = FALSE,
-    biocmanager_install = biocmanager_install
-  )
-}
-
-#' @rdname projr_renv_install
-#' @export
-projr_renv_restore_and_update <- function(github = TRUE,
-                                          non_github = TRUE,
-                                          biocmanager_install = FALSE) {
-  projr_renv_restore(github, non_github, biocmanager_install)
-  projr_renv_update(!github, !non_github, biocmanager_install)
 }
