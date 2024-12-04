@@ -13,9 +13,7 @@
 #' @export
 projr_renv_dep_add <- function(pkg) {
   # Ensure the cli package is available
-  if (!requireNamespace("cli", quietly = TRUE)) {
-    install.packages("cli")
-  }
+  .ensure_cli()
 
   # Extract package names from possible remotes
   pkg_names <- sapply(pkg, function(x) sub("^.*/", "", x))
@@ -102,10 +100,7 @@ projr_renv_dep_add <- function(pkg) {
 projr_renv_restore_or_update <- function(restore_gh = TRUE,
                                          restore_non_gh = TRUE,
                                          biocmanager_install = FALSE) {
-  # Ensure the cli package is available
-  if (!requireNamespace("cli", quietly = TRUE)) {
-    try(install.packages("cli"))
-  }
+  .ensure_cli()
 
   cli::cli_h1("Starting renv environment restoration/update")
 
@@ -118,6 +113,12 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
   )
   cli::cli_h1("renv environment restoration/update completed")
   invisible(TRUE)
+}
+
+.ensure_cli <- function() {
+  if (!requireNamespace("cli", quietly = TRUE)) {
+    try(renv::install("cli", prompt = FALSE))
+  }
 }
 
 .projr_renv_lockfile_pkg_get <- function() {
@@ -156,9 +157,7 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
                                             restore_gh,
                                             biocmanager_install) {
   # Ensure the cli package is available
-  if (!requireNamespace("cli", quietly = TRUE)) {
-    try(install.packages("cli"))
-  }
+  .ensure_cli()
 
   if (restore_non_gh) {
     cli::cli_alert_info("Restoring CRAN packages.")
@@ -208,9 +207,7 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
   }
 
   # Ensure the cli package is available
-  if (!requireNamespace("cli", quietly = TRUE)) {
-    install.packages("cli")
-  }
+  .ensure_cli()
 
   pkg_type <- if (is_bioc) "Bioconductor" else if (all(grepl("/", pkg))) "GitHub" else "CRAN"
 
@@ -237,9 +234,7 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
 
 .projr_renv_restore_remaining <- function(pkg) {
   # Ensure the cli package is available
-  if (!requireNamespace("cli", quietly = TRUE)) {
-    try(install.packages("cli"))
-  }
+  .ensure_cli()
 
   installed_pkgs <- rownames(installed.packages())
   pkg_remaining <- pkg[!pkg %in% installed_pkgs]
@@ -261,9 +256,7 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
 
 .projr_renv_install <- function(pkg, biocmanager_install, is_bioc) {
   # Ensure the cli package is available
-  if (!requireNamespace("cli", quietly = TRUE)) {
-    try(install.packages("cli"))
-  }
+  .ensure_cli()
 
   if (is_bioc) {
     if (biocmanager_install) {
@@ -281,9 +274,7 @@ projr_renv_restore_or_update <- function(restore_gh = TRUE,
 
 .projr_renv_install_remaining <- function(pkg, biocmanager_install, is_bioc) {
   # Ensure the cli package is available
-  if (!requireNamespace("cli", quietly = TRUE)) {
-    try(install.packages("cli"))
-  }
+  .ensure_cli()
 
   installed_pkgs <- rownames(installed.packages())
   pkg_remaining <- pkg[
