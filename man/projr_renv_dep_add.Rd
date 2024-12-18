@@ -2,19 +2,29 @@
 % Please edit documentation in R/projr_renv_dep_add.R
 \name{projr_renv_dep_add}
 \alias{projr_renv_dep_add}
-\title{Adds a package to _dependencies.R file for renv to pick up}
+\title{Add Packages to \verb{_dependencies.R} for renv}
 \usage{
 projr_renv_dep_add(pkg)
 }
 \arguments{
-\item{pkg}{character vector.
-Packages to add to _dependencies.R, and install
-if not already installed.
-Can use "\if{html}{\out{<remote>}}/\if{html}{\out{<repo>}}" syntax for installing from
-(GitHub) remotes, as long as \code{<repo>} is also
-the name of the package.}
+\item{pkg}{Character vector of package names.
+Packages to add to \verb{_dependencies.R} and install if not already installed.
+Can use the "\verb{<remote>/<repo>}" syntax for installing from remotes (e.g., GitHub), provided that \verb{<repo>} is also the name of the package.}
+}
+\value{
+Invisibly returns \code{TRUE} upon successful completion.
 }
 \description{
-Adds \code{library(<pkg>)} for each
-package listed. Installs them if they're not already installed.
+Adds \verb{library(<pkg>)} calls for each package listed to the \verb{_dependencies.R} file.
+Installs packages if they are not already installed.
+}
+\examples{
+\dontrun{
+# Add and install CRAN packages
+projr_renv_dep_add(c("dplyr", "ggplot2"))
+
+# Add and install a GitHub package
+projr_renv_dep_add("hadley/httr")
+}
+
 }

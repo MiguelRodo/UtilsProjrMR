@@ -1,6 +1,6 @@
 Package: UtilsProjrMR
 Title: Assist project set-up and running
-Version: 0.0.4
+Version: 0.0.5
 Authors@R: 
     person("Miguel", "Rodo", , "rdxmig002@myuct.ac.za", role = c("aut", "cre"),
            comment = c(ORCID = "0000-0002-2036-4878"))
@@ -10,7 +10,7 @@ Description: Utility functions to assist R project set up, particularly
 License: MIT + file LICENSE
 Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
-RoxygenNote: 7.2.3
+RoxygenNote: 7.3.2
 Suggests: 
     here,
     projr,
@@ -23,5 +23,5 @@ Suggests:
     languageserver,
     jsonlite,
     cli
-Remotes:  
+Remotes: 
     SATVILab/projr
