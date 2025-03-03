@@ -12,7 +12,7 @@ list(
   # specify _projr directories
   # ------------------
   tar_target(
-    dir_data_raw, projr::projr_path_get_dir("data-raw"),
+    dir_data_raw, projr::projr_path_get_dir("raw-data"),
     cue = tar_cue(mode = "always")
   ),
   tar_target(
