@@ -29,6 +29,8 @@ projr_tar_pipeline_create <- function(proj_nm) {
   }
 
   library(targets)
+  # ensure name is valid
+  proj_nm <- gsub("-", "_", proj_nm)
   # set project store and script
   dir_store <- projr::projr_path_get_dir("cache", "targets", proj_nm, "_targets")
   path_script <- projr::projr_path_get(
