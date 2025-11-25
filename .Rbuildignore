@@ -10,3 +10,5 @@
 ^\.gitpod\.yml$
 ^\.Renviron$
 ^EntireProject\.code-workspace$
+^\.github$
+^codecov\.yml$
