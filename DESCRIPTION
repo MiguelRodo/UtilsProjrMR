@@ -12,16 +12,19 @@ Encoding: UTF-8
 Roxygen: list(markdown = TRUE)
 RoxygenNote: 7.3.2
 Suggests: 
-    here,
-    projr,
-    targets,
-    ggplot2,
-    tibble,
     bookdown,
-    rmarkdown,
+    cli,
+    covr,
     devtools,
-    languageserver,
+    ggplot2,
+    here,
     jsonlite,
-    cli
+    languageserver,
+    projr,
+    rmarkdown,
+    targets,
+    testthat (>= 3.0.0),
+    tibble
+Config/testthat/edition: 3
 Remotes: 
     SATVILab/projr
