@@ -20,15 +20,7 @@ knitr::opts_chunk$set(
 [![Codecov test coverage](https://codecov.io/gh/MiguelRodo/UtilsProjrMR/graph/badge.svg)](https://app.codecov.io/gh/MiguelRodo/UtilsProjrMR)
 <!-- badges: end -->
 
-UtilsProjrMR provides utility functions to assist with R project set-up, 
-particularly when using the [`projr`](https://github.com/SATVILab/projr) package. 
-It includes helper functions for:
-
-- Project initialization and configuration
-- SLURM script generation for HPC environments  
-- renv package management
-- targets pipeline setup
-- Common code snippets for plotting and file operations
+UtilsProjrMR provides utility functions for managing R projects using [`renv`](https://rstudio.github.io/renv/) for dependency management, with additional helpers for [`projr`](https://github.com/SATVILab/projr) workflows, HPC (SLURM) environments, and [`targets`](https://docs.ropensci.org/targets/) pipelines.
 
 ## Installation
 
@@ -41,39 +33,47 @@ devtools::install_github("MiguelRodo/UtilsProjrMR")
 
 ## Usage
 
-### Project Initialization
+### renv Package Management
 
-To assist with project set-up, including configuring `.Rprofile` for development and installing useful packages:
+The primary functionality of this package is robust `renv` restoration and management:
 
 ```r
 library(UtilsProjrMR)
-projr_init_extra()
-```
 
-### Code Snippets
-
-The package provides several `projr_cat_*` functions that print out commonly-used code snippets:
-  
-- `projr_cat_plot_bg_white()` - Add white background theme to ggplot
-- `projr_cat_rsync()` - Rsync command for HPC file transfers
-- `projr_cat_slurm_header()` - SLURM batch script header
-- `projr_cat_slurm_rmd()` - SLURM script for rendering R Markdown
-- `projr_cat_pandoc_image()` - Markdown image syntax
-- `projr_cat_source_script_r()` - Code to source all R scripts
-
-### renv Management
-
-Functions to help manage renv lockfiles and packages:
-
-```r
-# Add packages to _dependencies.R and install them
-projr_renv_dep_add(c("dplyr", "ggplot2"))
-
-# Restore packages from lockfile
+# Restore packages from renv lockfile (recommended)
 projr_renv_restore()
 
 # Update packages to latest versions
 projr_renv_update()
+
+# Restore then update all packages
+projr_renv_restore_and_update()
+
+# Add packages to _dependencies.R and install them
+projr_renv_dep_add(c("dplyr", "ggplot2"))
+```
+
+The `projr_renv_restore()` function handles CRAN, Bioconductor, and GitHub packages with automatic fallback for packages that fail to restore.
+
+### Project Initialization
+
+Configure your project for development with VS Code support:
+
+```r
+# Set up .Rprofile for development and install useful packages
+projr_init_extra()
+```
+
+### targets Pipeline
+
+Helpers for setting up and managing [`targets`](https://docs.ropensci.org/targets/) pipelines:
+
+```r
+# Create a new targets pipeline
+projr_tar_pipeline_create("my_analysis")
+
+# Activate an existing pipeline
+projr_tar_pipeline_activate("my_analysis")
 ```
 
 ### File Operations
@@ -85,20 +85,6 @@ projr_file_ext_r_fix()
 # Source all R scripts in R/ directory
 projr_source_script_r()
 ```
-
-### targets Pipeline
-
-```r
-# Create a new targets pipeline
-projr_tar_pipeline_create("my_analysis")
-
-# Activate an existing pipeline
-projr_tar_pipeline_activate("my_analysis")
-```
-
-## Contributing
-
-Contributions are welcome! Please feel free to submit a Pull Request.
 
 ## License
 
