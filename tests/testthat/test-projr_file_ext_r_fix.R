@@ -17,9 +17,8 @@ test_that("projr_file_ext_r_fix handles directories correctly", {
   
   # Run the function
   result <- projr_file_ext_r_fix(dir_r = test_r_dir, dir_rmd = test_rmd_dir)
-  
-  # Check result
 
+  # Check result
   expect_true(result)
   
   # Check that files were renamed
