@@ -35,7 +35,13 @@ If \code{TRUE}, Bioconductor packages will be installed using \code{BiocManager:
 Default is \code{FALSE}.}
 }
 \value{
-Invisibly returns \code{TRUE} upon successful completion.
+Invisibly returns a list with the following elements:
+\describe{
+\item{success}{Logical indicating overall success.}
+\item{failed_packages}{Character vector of packages that failed to install/restore.}
+\item{successful_packages}{Character vector of packages successfully installed/restored.}
+\item{skipped_packages}{Character vector of packages that were skipped.}
+}
 }
 \description{
 Functions to manage the restoration and updating of packages specified in the \code{renv} lockfile.
@@ -51,19 +57,24 @@ Control whether to process GitHub packages, non-GitHub packages (CRAN and Biocon
 \examples{
 \dontrun{
 # Restore all packages
-projr_renv_restore()
+result <- projr_renv_restore()
 
 # Update all packages
-projr_renv_update()
+result <- projr_renv_update()
 
 # Restore and then update all packages
-projr_renv_restore_and_update()
+result <- projr_renv_restore_and_update()
 
 # Only restore non-GitHub packages
-projr_renv_restore(github = FALSE)
+result <- projr_renv_restore(github = FALSE)
 
 # Only update GitHub packages
-projr_renv_update(non_github = FALSE)
+result <- projr_renv_update(non_github = FALSE)
+
+# Check results
+if (!result$success) {
+  message("Failed packages: ", paste(result$failed_packages, collapse = ", "))
+}
 }
 
 }
